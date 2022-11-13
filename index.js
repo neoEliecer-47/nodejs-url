@@ -1,7 +1,43 @@
 const express = require('express')
-const app = express()
-const port = 5000;
+const session = require('express-session')
+const flash = require('connect-flash')
+const passport = require('passport')
 const { create } = require("express-handlebars")
+const User = require('./models/User')
+const csurf = require('csurf')
+require("dotenv").config()
+require("./databse/db")
+
+
+const app = express()
+//const port = 5000;
+
+
+app.use(
+
+    session({
+        secret: 'keyboard cat',
+        resave: false,
+        saveUninitialized: false,
+        name: "secret-name-neo"
+    })
+)
+
+app.use(flash())
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+//inicializar passport
+        //nos crea la sesión        
+passport.serializeUser((user, done) => done(null, {id: user._id, userNombre: user.userNombre})) //a travez de passport, estamos creando un req.user mandandole las porpiedades del usuario que haga sesion, id y nombre en este caso
+        //mantiene la sesión
+passport.deserializeUser(async(user, done) => { //estamos reciendo el objeto aqui (user) del serializeUser
+
+    const userDB = await User.findById(user.id)
+    return done(null, {id: userDB._id, userNombre: userDB.userNombre})//{id: userDB._id, userNombre: userDB.userNombre} <---- con esto volvemos a crear el req.user
+})
+
 
 const hbs = create({
     extname: ".hbs",
@@ -16,8 +52,21 @@ app.set("views", "./views");
                     //middlewares
 app.use(express.static(__dirname + '/public')) //__dirname es, desde nuestro archivo index, toma la ruta publica (esto para informar al servidor que es lo que tomará)
 //todo lo que en la ruta pública se coloque, pertenece al frontend, por lo cual será publica para el cliente por el navegador
+app.use(express.urlencoded({extended: true})) //para poder tomar los valores con post (por el body) activamos los formularios
+
+app.use(csurf())
+
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken() // con esto no necesito enviar el token a cada vista (render), ahora lo configuramos de manera global para todas las renderizaciones en las vistas
+    res.locals.mensajes = req.flash("mensajes")
+    next()
+})
+
 app.use("/", require('./Routes/home'))
 app.use("/auth", require('./Routes/auth'))
 
-app.listen(port, () => console.log('servidor trabajando ✅'))
+
+const PORT = process.env.PORT || 5000
+
+app.listen(PORT, () => console.log('servidor trabajando ✅ '+PORT))
 

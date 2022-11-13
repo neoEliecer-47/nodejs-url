@@ -1,1 +1,33 @@
-<h1>login💌</h1>
+<h1 class="text-center my-4" style="font-family: bold 12px ; color: white; -webkit-text-stroke: 2px black;">Login de usuarios</h1>
+
+<div class="row justify-content-center">
+   <div class="col-md-4">
+
+<form action="/auth/login" method="POST" class="form-control border-success" style="background-color: rgb(197, 144, 238);">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+    <input
+      type="text"
+      name="userEmail"
+      placeholder="ingrese email"
+      class="form-control mb-2 border-primary"
+      value=""
+      autofocus      
+    >
+
+    <input
+      type="password"
+      name="password"
+      placeholder="ingrese contraseña"
+      class="form-control mb-2 border-primary"
+      value="123456"      
+    >
+    
+    <button class="btn btn-outline-success border-primary w-100" type="submit">Acceder</button>
+    
+    
+
+    
+        </form>
+
+    </div>
+</div>

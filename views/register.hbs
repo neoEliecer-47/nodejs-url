@@ -1,0 +1,46 @@
+<h1 class="text-center my-5" style="font-family: bold 10;">registro de usuarios</h1>
+
+<div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+        <form action="/auth/register" method="POST" class="form-control border-success" style="background-color: lightgreen;">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+    <input
+      type="text"
+      name="userNombre"
+      placeholder="ingrese nombre"
+      class="form-control mb-2 border-primary"
+      value=""
+      autofocus   
+    >
+
+    <input
+      type="text"
+      name="userEmail"
+      placeholder="ingrese email"
+      class="form-control mb-2 border-primary"
+      value=""      
+    >
+
+    <input
+      type="password"
+      name="password"
+      placeholder="ingrese contraseña"
+      class="form-control mb-2 border-primary"
+      value="123456"      
+    >
+
+    <input
+      type="password"
+      name="RePassword"
+      placeholder="repita contraseña"
+      class="form-control mb-2 border-primary"
+      value="123456"      
+    >
+
+    <button class="btn btn-success border-primary" type="submit">Registrar usuario</button>
+        </form>
+
+    </div>
+</div>
