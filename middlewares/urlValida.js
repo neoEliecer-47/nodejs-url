@@ -33,7 +33,8 @@ const urlValidar = (req, res, next) => {
         
         
             
-            return res.redirect("/")
+        return res.redirect("/")
+        
             //return res.redirect("/editar/"+req.params.id) //lo redirecciona junto con el parametro(id) que este en ese moento en la sesion
         
     }

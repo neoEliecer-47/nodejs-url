@@ -2,28 +2,44 @@ const express = require('express')
 const session = require('express-session')
 const flash = require('connect-flash')
 const passport = require('passport')
+const mongoStore = require('connect-mongo')
+const mongoSanitize = require('express-mongo-sanitize');
+const cors = require('cors')
 const { create } = require("express-handlebars")
 const User = require('./models/User')
 const csurf = require('csurf')
 require("dotenv").config()
-require("./databse/db")
+const clientDB = require('./databse/db')//nos traemos el cliente de la promesa
 
 
 const app = express()
 //const port = 5000;
 
+const corsOptions = {
+    credentials: true,                      //si existe el path, ocúpelo, de lo contrario use cualquiera
+    origin: process.env.PATHHEROKU || "*", //la variable de entorno es la uri y en caso de que no exista '||' hace el 'todos'= '*'
+    methods: ["GET"," POST"]
+};
+app.use(cors(corsOptions));
+
 
 app.use(
 
     session({
-        secret: 'keyboard cat',
+        secret: process.env.SECRETSESSION,
         resave: false,
         saveUninitialized: false,
-        name: "secret-name-neo"
+        name: "sessionu-user",
+        store: mongoStore.create({ //'create' es para hacer configuraciones
+            clientPromise: clientDB,
+            dbName: process.env.DBNAME
+        }),
+        cookie: { secure: process.env.MODO === 'produccion' ? true : false, maxAge: 30 * 24 * 60 * 60 * 1000 },
+                //secure trabaja con solicitudes https, por lo cual, localhost que trabaja con http, nos dará un error
     })
 )
 
-app.use(flash())
+app.use(flash())                                                                                     
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -55,6 +71,7 @@ app.use(express.static(__dirname + '/public')) //__dirname es, desde nuestro arc
 app.use(express.urlencoded({extended: true})) //para poder tomar los valores con post (por el body) activamos los formularios
 
 app.use(csurf())
+app.use(mongoSanitize())//esto intercepta los request y los limpia, para dar mas seguridad en nuestra BD
 
 app.use((req, res, next) => {
     res.locals.csrfToken = req.csrfToken() // con esto no necesito enviar el token a cada vista (render), ahora lo configuramos de manera global para todas las renderizaciones en las vistas
